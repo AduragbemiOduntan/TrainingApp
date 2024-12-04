@@ -1,5 +1,4 @@
-﻿using System;
-using TrainingApp.Application.Services.Interface;
+﻿using TrainingApp.Application.Services.Interface;
 using TrainingApp.Domain.Models;
 using TrainingApp.Infrastructure.DbContext;
 using TrainingApp.Shared.DTOs.RequestDTOs;
@@ -38,19 +37,11 @@ namespace TrainingApp.Application.Services.Implementation
                     continue;
                 }
 
-                //if (!dbContext.Courses.Any(c => c.CourseId == person.CourseId))
-                //{
-                //    errors.Add($"Invalid courseId: {person.CourseId}");
-                //    continue;
-                //}
-
-
                 if (dbContext.PersonCourses.Any(pc => pc.PersonId == person.PersonId && pc.CourseId == person.CourseId))
                 {
                     errors.Add($"Duplicate entry for person course id: {person.PersonId} and courseId: {person.CourseId}");
                     continue;
                 }
-
 
                 var newPerson = new Person
                 {
@@ -77,31 +68,72 @@ namespace TrainingApp.Application.Services.Implementation
             return StandardResponse<List<PersonResponseDTO>>.Success("Persons successfully created", addedPersons);
         }
 
-        public PersonResponseDTO GetPersonById(string id)
+        public StandardResponse<PersonProgressResponseDTO> GetPersonProgressById(string personId)
+        {
+            try
+            {
+                if(string.IsNullOrWhiteSpace(personId))
+                {
+                    return StandardResponse<PersonProgressResponseDTO>.Failed("Person id cannot be null");
+                }
+                var person = dbContext.Persons.FirstOrDefault(p => p.PersonId.Equals(personId));
+                if (person == null)
+                {
+                    return StandardResponse<PersonProgressResponseDTO>.Failed($"Person with id: {personId} does not exist");
+                }
+                var personCourses = dbContext.PersonCourses.Where(pc => pc.PersonId.Equals(personId)).ToList();
+                var personProgress = new PersonProgressResponseDTO
+                {
+                    PersonName = person.Name,
+                };
+
+                double totalScore = 0; double count = 0;
+                foreach (var personCourse in personCourses)
+                {
+                    var course = dbContext.Courses.FirstOrDefault(c => c.CourseId.Equals(personCourse.CourseId));
+                    if (course == null )
+                    {
+                        return StandardResponse<PersonProgressResponseDTO>.Success($"No course progress for person with id: {personId}", new PersonProgressResponseDTO());
+                    }
+                    if (course != null)
+                    {
+                        var courseScore = new CourseScoreResponseDTO
+                        {
+                            CourseName = course.CourseName,
+                            Score = personCourse.Score,
+                        };
+                        personProgress.CourseScore.Add(courseScore);
+                        totalScore += courseScore.Score;
+                        count++;
+                    }
+                }
+                if (totalScore > 0)
+                {
+                    personProgress.GradePointAverage = totalScore / count;
+                }
+                else
+                {
+                    personProgress.GradePointAverage = 0;
+                }
+
+                return StandardResponse<PersonProgressResponseDTO>.Success("Person progress successfully retrieved", personProgress);
+            }
+            catch (Exception ex)
+            {
+                return StandardResponse<PersonProgressResponseDTO>.Failed($"Error: {ex.Message}");
+            }
+        }
+
+        public StandardResponse<PersonResponseDTO> GetPersonById(string personId)
         {
             throw new NotImplementedException();
         }
 
-        public List<PersonResponseDTO> GetPersons()
+        public StandardResponse<List<PersonResponseDTO>> GetPersons()
         {
             throw new NotImplementedException();
         }
     }
 
-
-    //public List<PersonResponseDTO> CreatePersons()
-    //{
-    //    throw new NotImplementedException();
-    //}
-
-    //public PersonResponseDTO GetPersonById(string id)
-    //{
-    //    throw new NotImplementedException();
-    //}
-
-    //public List<PersonResponseDTO> GetPersons()
-    //{
-    //    throw new NotImplementedException();
-    //}
 }
 

@@ -15,10 +15,10 @@ namespace TrainingApp.API.Controllers
                 return Ok(result);
         }
 
-        [HttpGet("get-progress")]
+        [HttpGet("get-progress/{id}")]
         public IActionResult GetPersonProgressById(string id)
         {
-            var result = personService.GetPersonById(id);
+            var result = personService.GetPersonProgressById(id);
             return Ok(result);
         }
     }

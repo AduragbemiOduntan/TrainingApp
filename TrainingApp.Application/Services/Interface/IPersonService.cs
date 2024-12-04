@@ -6,7 +6,10 @@ namespace TrainingApp.Application.Services.Interface
     public interface IPersonService
     {
         StandardResponse<List<PersonResponseDTO>> CreatePersons(List<PersonRequestDTO> persons);
-        List<PersonResponseDTO> GetPersons();
-        PersonResponseDTO GetPersonById(string id);
+        StandardResponse<PersonProgressResponseDTO> GetPersonProgressById(string personId);
+        StandardResponse<PersonResponseDTO> GetPersonById(string personId);
+        StandardResponse<List<PersonResponseDTO>> GetPersons();
+        
+        
     }
 }
