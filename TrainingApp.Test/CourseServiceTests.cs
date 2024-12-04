@@ -13,8 +13,8 @@ namespace TrainingApp.Test
 
         public CourseServiceTests()
         {
-            courseService = new CourseService(new AppDbContext());
             dbContext = new AppDbContext();
+            courseService = new CourseService(dbContext);        
         }
 
 
@@ -55,6 +55,21 @@ namespace TrainingApp.Test
         }
 
         [Fact]
+        public void CreateCourses_DuplicateCourseId_ReturnsFailedResponse()
+        {
+            var expected = new List<CourseRequestDTO>
+            {
+                new CourseRequestDTO { CourseId = "c11", CourseName = "Course One" },
+                new CourseRequestDTO { CourseId = "c11", CourseName = "Duplicate Course" }
+            };
+
+            var actual = courseService.CreateCourses(expected);
+
+            Assert.False(actual.Succeeded);
+            Assert.Contains("Duplicate courseId found in input", actual.Message);
+        }
+
+        [Fact]
         public void CreateCourses_ExistingCourseId_ReturnsFailedResponse()
         {
           
@@ -69,6 +84,25 @@ namespace TrainingApp.Test
 
             Assert.False(actual.Succeeded);
             Assert.Contains("Course with courseId: c1 already exists", actual.Message);
+        }
+
+        [Fact]
+        public void CreateCourses_ValidCourses_ReturnsSuccessResponse()
+        {
+
+            var expected = new List<CourseRequestDTO>
+            {
+                new CourseRequestDTO { CourseId = "c11", CourseName = "Course One" },
+                new CourseRequestDTO { CourseId = "c12", CourseName = "Course Two" }
+            };
+
+            var actual = courseService.CreateCourses(expected);
+
+            Assert.True(actual.Succeeded);
+            Assert.Contains("Courses successfully created", actual.Message);
+            Assert.Equal(2, actual.Data.Count);
+            Assert.Contains(actual.Data, c => c.CourseId == "c11" && c.CourseName == "Course One");
+            Assert.Contains(actual.Data, c => c.CourseId == "c12" && c.CourseName == "Course Two");
         }
     }
 }
