@@ -5,9 +5,9 @@ namespace TrainingApp.Application.Services.Interface
 {
     public interface ICourseService
     {
-        List<CourseResponseDTO> CreateCourses(List<CourseRequestDTO> courses);
-        List<CourseResponseDTO> GetCourses();
-        List<PersonCourseRequestDTO> GetPersonCourse();
+        StandardResponse<List<CourseResponseDTO>> CreateCourses(List<CourseRequestDTO> courses);
+        StandardResponse<List<CourseResponseDTO>> GetCourses();
+        StandardResponse<List<PersonCourseRequestDTO>> GetPersonCourse();
 
         
     }

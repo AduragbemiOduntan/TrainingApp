@@ -1,3 +1,6 @@
+using TrainingApp.Application.Services.Implementation;
+using TrainingApp.Application.Services.Interface;
+using TrainingApp.Infrastructure.DbContext;
 
 namespace TrainingApp.API
 {
@@ -8,6 +11,9 @@ namespace TrainingApp.API
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            builder.Services.AddSingleton<AppDbContext>();        
+            builder.Services.AddScoped<ICourseService, CourseService>();
+            builder.Services.AddScoped<IPersonService, PersonService>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

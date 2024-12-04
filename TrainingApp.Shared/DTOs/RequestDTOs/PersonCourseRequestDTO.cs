@@ -3,7 +3,7 @@
     public class PersonCourseRequestDTO
     {
         public string PersonCourseId { get; set; }
-        public string Score { get; set; }
+        public double Score { get; set; }
         public string CourseId { get; set; }
         public string PersonId { get; set; }
     }
